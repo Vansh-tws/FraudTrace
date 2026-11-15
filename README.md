@@ -6,7 +6,15 @@
 > ----------
 > **Backend Deployment(Render) **
 >
+> 🌐 **Live Demo**: [https://fraud-trace.vercel.app](https://fraud-trace.vercel.app)
+>
 > **Moving from simply detecting suspicious transactions to helping analysts investigate, explain, and understand them.**
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-fraud--trace.vercel.app-06b6d4?style=for-the-badge&logo=vercel&logoColor=white)](https://fraud-trace.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Vansh--tws%2FFraudTrace-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Vansh-tws/FraudTrace)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-19.0+-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 
 FraudTrace combines **Machine Learning (Isolation Forest & Behavioral Profiling)** for unsupervised anomaly detection, an **Autonomous AI Investigation Agent** for forensic reasoning, and the **Model Context Protocol (MCP)** for standardized tool discovery and execution.
 
