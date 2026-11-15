@@ -2,6 +2,8 @@
 ### Intelligent Financial Transaction Monitoring, Anomaly Detection & AI Investigation Platform
 
 > **Idea, Architecture & Development by [Vansh Raut](https://github.com/Vansh-tws) — Lead Fraud Analyst & Systems Engineer**
+> **Live Demo Link(Vercel) https://fraud-trace.vercel.app ** 
+> **Backend Deployment(Render) https://fraudtrace-cruw.onrender.com **
 >
 > **Moving from simply detecting suspicious transactions to helping analysts investigate, explain, and understand them.**
 
