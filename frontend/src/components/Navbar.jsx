@@ -5,7 +5,8 @@ import {
   Database,
   Sparkles,
   Upload,
-  UserCheck
+  UserCheck,
+  ShieldAlert
 } from 'lucide-react';
 
 export default function Navbar({
@@ -28,7 +29,7 @@ export default function Navbar({
   return (
     <header className="h-16 bg-[#0a0f1d]/90 backdrop-blur border-b border-slate-800/80 px-6 flex items-center justify-between z-10 sticky top-0">
       {/* Search Bar */}
-      <form onSubmit={handleSearchSubmit} className="relative w-80 md:w-96">
+      <form onSubmit={handleSearchSubmit} className="relative w-72 md:w-88">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <input
           type="text"
@@ -41,10 +42,17 @@ export default function Navbar({
 
       {/* Right Control Bar */}
       <div className="flex items-center space-x-3">
+        {/* Creator Ownership Pill */}
+        <div className="hidden xl:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-xs">
+          <Sparkles className="h-3 w-3 text-teal-400" />
+          <span className="text-slate-400">Created by:</span>
+          <span className="font-bold text-teal-300">Vansh Raut</span>
+        </div>
+
         {/* Switch / Upload Dataset Button */}
         <button
           onClick={onOpenDatasetModal}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 text-xs font-semibold border border-teal-500/30 transition cursor-pointer"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 text-xs font-semibold border border-teal-500/30 transition cursor-pointer"
         >
           <Upload className="h-3.5 w-3.5 text-teal-400" />
           <span>Switch Dataset</span>
@@ -64,14 +72,17 @@ export default function Navbar({
           <span className="font-mono text-teal-300 font-semibold">{mcpCount} Active</span>
         </div>
 
-        {/* Analyst Profile Pill */}
-        <div className="flex items-center space-x-2 pl-3 border-l border-slate-800">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-cyan-600 to-teal-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
-            FA
+        {/* Analyst Profile Pill - Vansh Raut */}
+        <div className="flex items-center space-x-2.5 pl-3 border-l border-slate-800">
+          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-cyan-500 to-teal-400 flex items-center justify-center text-xs font-bold text-slate-950 shadow-md ring-2 ring-teal-500/30 font-mono">
+            VR
           </div>
           <div className="hidden md:block text-left text-xs">
-            <div className="font-medium text-slate-200 leading-tight">Fraud Analyst</div>
-            <div className="text-[10px] text-teal-400">Risk Reviewer</div>
+            <div className="font-bold text-slate-100 leading-tight flex items-center space-x-1">
+              <span>Vansh Raut</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-400"></span>
+            </div>
+            <div className="text-[10px] text-teal-400 font-medium">Lead Fraud Analyst & Creator</div>
           </div>
         </div>
       </div>

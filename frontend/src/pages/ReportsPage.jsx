@@ -134,6 +134,9 @@ export default function ReportsPage({ initialCaseId = '' }) {
               <p className="text-xs text-slate-600 font-medium mt-1">
                 Financial Crimes Investigation & Compliance Unit • AML Division
               </p>
+              <p className="text-[10px] text-teal-800 font-mono font-semibold mt-0.5">
+                Platform Architecture & AI Systems: Conceived & Developed by Vansh Raut
+              </p>
             </div>
             <div className="text-right text-xs space-y-0.5 font-mono">
               <div className="font-bold text-slate-900">{report.report_id}</div>
@@ -260,7 +263,7 @@ export default function ReportsPage({ initialCaseId = '' }) {
               <div className="space-y-1">
                 <div>
                   <span className="text-slate-500">Signatory: </span>
-                  <span className="font-bold text-slate-900">{report.human_approval?.analyst_name || 'Pending Review'}</span>
+                  <span className="font-bold text-slate-900">{report.human_approval?.analyst_name || 'Vansh Raut (Lead Fraud Analyst)'}</span>
                 </div>
                 <div>
                   <span className="text-slate-500">Decision Rendered: </span>
@@ -278,8 +281,9 @@ export default function ReportsPage({ initialCaseId = '' }) {
               </div>
 
               <div className="text-right">
-                <div className="h-16 w-32 border-2 border-dashed border-slate-400 rounded flex items-center justify-center text-[10px] uppercase font-mono text-slate-500 font-bold">
-                  OFFICIAL STAMP
+                <div className="h-16 w-36 border-2 border-dashed border-teal-800 rounded flex flex-col items-center justify-center text-[9px] uppercase font-mono text-teal-900 font-bold bg-teal-50/50 p-1">
+                  <span>OFFICIAL AUDIT STAMP</span>
+                  <span className="text-[8px] text-teal-700">VANSH RAUT • LEAD</span>
                 </div>
                 <div className="text-[10px] text-slate-400 font-mono mt-1">
                   {report.human_approval?.reviewed_at

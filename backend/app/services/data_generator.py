@@ -325,7 +325,7 @@ def seed_database(num_customers=120, num_transactions=2000):
                 appr = Approval(
                     investigation_id=case_id,
                     decision="APPROVED_FRAUD",
-                    analyst_name="Priya Sharma (Lead Risk Analyst)",
+                    analyst_name="Vansh Raut (Lead Fraud Analyst)",
                     analyst_notes="Confirmed unauthorized account takeover attempt. Card frozen and customer notified.",
                     action_taken="ACCOUNT_RESTRICTED"
                 )
@@ -334,7 +334,7 @@ def seed_database(num_customers=120, num_transactions=2000):
                 appr = Approval(
                     investigation_id=case_id,
                     decision="REJECTED_LEGITIMATE",
-                    analyst_name="Vikram Mehta (Senior Analyst)",
+                    analyst_name="Vansh Raut (Lead Fraud Analyst)",
                     analyst_notes="Customer confirmed purchase of electronics during midnight sale via SMS OTP.",
                     action_taken="WHITELISTED"
                 )

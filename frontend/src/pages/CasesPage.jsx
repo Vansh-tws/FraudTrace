@@ -29,7 +29,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
 
   // Approval Form State
   const [decision, setDecision] = useState('APPROVED_FRAUD');
-  const [analystName, setAnalystName] = useState('Priya Sharma (Fraud Analyst)');
+  const [analystName, setAnalystName] = useState('Vansh Raut (Lead Fraud Analyst)');
   const [analystNotes, setAnalystNotes] = useState('');
   const [actionTaken, setActionTaken] = useState('ACCOUNT_RESTRICTED');
   const [submitting, setSubmitting] = useState(false);

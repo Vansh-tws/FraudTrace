@@ -21,7 +21,7 @@ class InvestigateRequest(BaseModel):
 
 class ApprovalRequest(BaseModel):
     decision: str = Field(..., description="APPROVED_FRAUD, REJECTED_LEGITIMATE, or ESCALATED")
-    analyst_name: str = "Senior Fraud Analyst"
+    analyst_name: str = "Vansh Raut (Lead Fraud Analyst)"
     analyst_notes: Optional[str] = None
     action_taken: str = "NONE"  # CARD_FROZEN, ACCOUNT_RESTRICTED, WHITELISTED, SAR_FILED, ESCALATED_LEGAL
 

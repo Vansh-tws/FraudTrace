@@ -316,6 +316,31 @@ export default function SettingsPage({ onDataReload }) {
           ))}
         </div>
       </div>
+
+      {/* Project Ownership & Architecture Card */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-teal-500/10 via-[#0d1424] to-slate-900 border border-teal-500/30 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 rounded-xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-300 font-bold text-sm font-mono shadow-sm">
+              VR
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+                <span>Vansh Raut</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                  Idea & Development Owner
+                </span>
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                Conceived, architected and developed by Vansh Raut — Lead Fraud Analyst & Systems Engineer.
+              </p>
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-slate-300 leading-relaxed pt-1 border-t border-slate-800/80">
+          FraudTrace demonstrates end-to-end Data Science, Unsupervised Isolation Forest Anomaly Detection, standard Model Context Protocol (MCP) tool integration, and human-in-the-loop AML compliance governance.
+        </p>
+      </div>
     </div>
   );
 }

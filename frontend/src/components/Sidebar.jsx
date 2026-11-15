@@ -10,7 +10,8 @@ import {
   Settings,
   Cpu,
   Layers,
-  Sparkles
+  Sparkles,
+  UserCheck
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, pendingCasesCount = 0 }) {
@@ -44,7 +45,7 @@ export default function Sidebar({ activeTab, setActiveTab, pendingCasesCount = 0
         {/* Navigation */}
         <nav className="p-3 space-y-1">
           <div className="px-3 py-2 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
-            Platform Modules
+            PLATFORM MODULES
           </div>
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -53,7 +54,7 @@ export default function Sidebar({ activeTab, setActiveTab, pendingCasesCount = 0
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
                   isActive
                     ? 'bg-gradient-to-r from-teal-500/15 to-cyan-500/5 text-teal-300 border border-teal-500/30 shadow-sm'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -74,26 +75,35 @@ export default function Sidebar({ activeTab, setActiveTab, pendingCasesCount = 0
         </nav>
       </div>
 
-      {/* System Status Footer */}
-      <div className="p-4 m-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
-        <div className="flex items-center justify-between text-slate-400 mb-2">
-          <span className="flex items-center space-x-1.5 text-[11px] font-medium">
-            <Cpu className="h-3.5 w-3.5 text-teal-400" />
-            <span>Detection Engine</span>
-          </span>
-          <span className="flex items-center space-x-1 text-emerald-400 text-[10px] font-semibold">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Online</span>
-          </span>
+      {/* Creator Ownership Banner Footer */}
+      <div className="p-4 m-3 rounded-2xl bg-gradient-to-b from-slate-900 via-[#0d1424] to-slate-900 border border-teal-500/20 text-xs shadow-md">
+        <div className="flex items-center space-x-2.5 mb-2">
+          <div className="h-7 w-7 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-300 font-bold text-xs font-mono">
+            VR
+          </div>
+          <div>
+            <div className="text-xs font-bold text-white flex items-center space-x-1">
+              <span>Vansh Raut</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-400"></span>
+            </div>
+            <div className="text-[10px] text-teal-400 font-semibold uppercase tracking-wider">
+              Idea & Development
+            </div>
+          </div>
         </div>
-        <div className="text-[11px] text-slate-300 space-y-1">
+
+        <div className="text-[11px] text-slate-400 space-y-1 pt-1.5 border-t border-slate-800/80">
           <div className="flex justify-between">
-            <span className="text-slate-500">Algorithm:</span>
-            <span className="font-mono text-slate-300 text-[10px]">Isolation Forest</span>
+            <span className="text-slate-500">Lead Analyst:</span>
+            <span className="text-slate-300 font-medium">Vansh Raut</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-500">Agent Protocol:</span>
-            <span className="font-mono text-teal-300 text-[10px]">MCP Python 2.x</span>
+            <span className="text-slate-500">ML Engine:</span>
+            <span className="font-mono text-teal-300 text-[10px]">Isolation Forest</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-500">Tool Protocol:</span>
+            <span className="font-mono text-teal-300 text-[10px]">Python MCP 2.x</span>
           </div>
         </div>
       </div>

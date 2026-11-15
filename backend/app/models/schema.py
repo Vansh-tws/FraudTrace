@@ -247,7 +247,7 @@ class Approval(Base):
     investigation_id = Column(String(50), ForeignKey("investigations.id"), nullable=False, index=True)
     decision = Column(String(40), nullable=False)  # APPROVED_FRAUD, REJECTED_LEGITIMATE, ESCALATED
     analyst_notes = Column(Text, nullable=True)
-    analyst_name = Column(String(100), nullable=False, default="Senior Fraud Analyst")
+    analyst_name = Column(String(100), nullable=False, default="Vansh Raut (Lead Fraud Analyst)")
     action_taken = Column(String(60), default="NONE")  # CARD_FROZEN, ACCOUNT_RESTRICTED, WHITELISTED, SAR_FILED, ESCALATED_LEGAL
     reviewed_at = Column(DateTime, default=utcnow)
 

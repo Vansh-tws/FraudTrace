@@ -1,6 +1,8 @@
 # FraudTrace 🛡️
 ### Intelligent Financial Transaction Monitoring, Anomaly Detection & AI Investigation Platform
 
+> **Idea, Architecture & Development by [Vansh Raut](https://github.com/vanshraut) — Lead Fraud Analyst & Systems Engineer**
+>
 > **Moving from simply detecting suspicious transactions to helping analysts investigate, explain, and understand them.**
 
 FraudTrace combines **Machine Learning (Isolation Forest & Behavioral Profiling)** for unsupervised anomaly detection, an **Autonomous AI Investigation Agent** for forensic reasoning, and the **Model Context Protocol (MCP)** for standardized tool discovery and execution.
