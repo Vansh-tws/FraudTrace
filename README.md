@@ -1,7 +1,7 @@
 # FraudTrace 🛡️
 ### Intelligent Financial Transaction Monitoring, Anomaly Detection & AI Investigation Platform
 
-> **Idea, Architecture & Development by [Vansh Raut](https://github.com/vanshraut) — Lead Fraud Analyst & Systems Engineer**
+> **Idea, Architecture & Development by [Vansh Raut](https://github.com/Vansh-tws) — Lead Fraud Analyst & Systems Engineer**
 >
 > **Moving from simply detecting suspicious transactions to helping analysts investigate, explain, and understand them.**
 
