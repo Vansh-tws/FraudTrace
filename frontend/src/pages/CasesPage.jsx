@@ -29,7 +29,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
 
   // Approval Form State
   const [decision, setDecision] = useState('APPROVED_FRAUD');
-  const [analystName, setAnalystName] = useState('Priya Sharma (Senior Fraud Specialist)');
+  const [analystName, setAnalystName] = useState('Priya Sharma (Fraud Analyst)');
   const [analystNotes, setAnalystNotes] = useState('');
   const [actionTaken, setActionTaken] = useState('ACCOUNT_RESTRICTED');
   const [submitting, setSubmitting] = useState(false);
@@ -78,12 +78,12 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
     submitCaseApproval(selectedCaseId, {
       decision,
       analyst_name: analystName,
-      analyst_notes: analystNotes || 'Decision rendered following forensic observation and customer verification review.',
+      analyst_notes: analystNotes || 'Decision rendered following customer verification.',
       action_taken: actionTaken,
     })
       .then((res) => {
         setSubmitting(false);
-        setSuccessMsg(`Decision '${decision}' recorded successfully.`);
+        setSuccessMsg(`Decision successfully recorded.`);
         loadCases();
         selectCase(selectedCaseId);
       })
@@ -106,16 +106,29 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
     }
   };
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'APPROVED_FRAUD':
+        return 'Confirmed Fraud';
+      case 'REJECTED_LEGITIMATE':
+        return 'Marked Legitimate';
+      case 'ESCALATED':
+        return 'Escalated';
+      default:
+        return 'Pending Review';
+    }
+  };
+
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center space-x-2.5">
-            <span>Human Approval System & Governance Board</span>
+            <span>Analyst Review & Decisions</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Review autonomous AI forensic recommendations, record human determinations, and enforce policy actions.
+            Review AI findings, verify transactions with the customer, and make the final decision.
           </p>
         </div>
 
@@ -162,7 +175,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
         <div className="lg:col-span-5 space-y-3">
           <div className="p-4 rounded-2xl bg-[#0d1322] border border-slate-800/80">
             <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">
-              Cases Queue ({cases.length})
+              Case Queue ({cases.length})
             </h2>
 
             {loading ? (
@@ -172,7 +185,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
               </div>
             ) : cases.length === 0 ? (
               <div className="py-12 text-center text-slate-500 text-xs">
-                No cases found for selected status.
+                No cases found.
               </div>
             ) : (
               <div className="space-y-2 max-h-[680px] overflow-y-auto pr-1">
@@ -191,7 +204,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="font-mono text-teal-300 font-semibold text-xs">{c.id}</span>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadge(c.status)}`}>
-                          {c.status}
+                          {getStatusLabel(c.status)}
                         </span>
                       </div>
 
@@ -199,7 +212,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
 
                       <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono">
                         <span>TXN: {c.transaction_id}</span>
-                        <span className="text-amber-300 font-semibold">{c.risk_score?.toFixed(1)}/100</span>
+                        <span className="text-amber-300 font-semibold">{c.risk_score?.toFixed(0)}/100 Risk</span>
                       </div>
                     </div>
                   );
@@ -214,27 +227,27 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
           {detailLoading ? (
             <div className="p-12 rounded-2xl bg-[#0d1322] border border-slate-800 text-center text-slate-400 text-xs">
               <div className="animate-spin h-6 w-6 border-2 border-teal-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-              Loading case audit file...
+              Loading case details...
             </div>
           ) : caseDetail ? (
             <div className="space-y-6">
-              {/* Case Header Dossier */}
+              {/* Case Header */}
               <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
                   <div>
                     <span className="text-[10px] font-mono text-slate-500 uppercase">{caseDetail.id}</span>
-                    <h2 className="text-lg font-bold text-white">{caseDetail.title}</h2>
+                    <h2 className="text-base font-bold text-white">{caseDetail.title}</h2>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadge(caseDetail.status)}`}>
-                      {caseDetail.status}
+                      {getStatusLabel(caseDetail.status)}
                     </span>
                     <button
                       onClick={() => onNavigateToReport(caseDetail.id)}
                       className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center space-x-1 cursor-pointer"
                     >
                       <FileText className="h-3.5 w-3.5 text-teal-400" />
-                      <span>Full SAR Report</span>
+                      <span>Formal Report</span>
                     </button>
                   </div>
                 </div>
@@ -242,15 +255,15 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                 {/* AI Summary Banner */}
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
                   <span className="text-[11px] font-semibold text-teal-400 block mb-1">
-                    AI Autonomous Agent Finding:
+                    AI Investigation Findings:
                   </span>
                   <p className="text-slate-300 leading-relaxed text-[11px]">{caseDetail.ai_summary}</p>
                 </div>
 
-                {/* Recommendation */}
+                {/* AI Recommendation */}
                 <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20 text-xs">
                   <span className="text-[11px] font-semibold text-amber-300 block mb-0.5">
-                    Recommended Policy Action:
+                    AI Suggested Action:
                   </span>
                   <p className="text-slate-200 italic text-[11px]">"{caseDetail.recommendation}"</p>
                 </div>
@@ -258,7 +271,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                 {/* Human Approval Form */}
                 <form onSubmit={handleApprovalSubmit} className="pt-4 border-t border-slate-800 space-y-4">
                   <h3 className="text-xs font-semibold text-white uppercase tracking-wider">
-                    Analyst Human-in-the-Loop Determination
+                    Your Decision as Analyst
                   </h3>
 
                   {successMsg && (
@@ -278,7 +291,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-xs">Approve Fraud</span>
+                        <span className="font-semibold text-xs">Confirm Fraud</span>
                         <input
                           type="radio"
                           name="decision"
@@ -291,7 +304,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                           className="text-red-500"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400">Confirm unauthorized activity & block account.</span>
+                      <span className="text-[10px] text-slate-400">Activity is unauthorized; block customer card/account.</span>
                     </label>
 
                     <label
@@ -315,7 +328,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                           className="text-emerald-500"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400">False positive confirmed via customer SMS/call.</span>
+                      <span className="text-[10px] text-slate-400">False alarm; customer confirmed it was them.</span>
                     </label>
 
                     <label
@@ -326,7 +339,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-xs">Escalate to Legal</span>
+                        <span className="font-semibold text-xs">Escalate</span>
                         <input
                           type="radio"
                           name="decision"
@@ -339,29 +352,29 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                           className="text-amber-500"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400">Complex AML velocity ring; file formal SAR.</span>
+                      <span className="text-[10px] text-slate-400">Suspicious repeat pattern; escalate to senior compliance.</span>
                     </label>
                   </div>
 
                   {/* Policy Action Selector & Analyst Info */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="text-slate-400 block mb-1">Enforced Action</label>
+                      <label className="text-slate-400 block mb-1">Action to Take</label>
                       <select
                         value={actionTaken}
                         onChange={(e) => setActionTaken(e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-teal-500 text-xs"
                       >
-                        <option value="ACCOUNT_RESTRICTED">ACCOUNT_RESTRICTED (Freeze digital transfer limits)</option>
-                        <option value="CARD_FROZEN">CARD_FROZEN (Block active payment card)</option>
-                        <option value="WHITELISTED">WHITELISTED (Authorize transaction & dismiss flag)</option>
-                        <option value="SAR_FILED">SAR_FILED (Submit Suspicious Activity Report to FIU)</option>
-                        <option value="ESCALATED_LEGAL">ESCALATED_LEGAL (Refer to AML compliance counsel)</option>
+                        <option value="ACCOUNT_RESTRICTED">Block Online Transfers (Temporary Hold)</option>
+                        <option value="CARD_FROZEN">Freeze Payment Card</option>
+                        <option value="WHITELISTED">Mark Safe & Clear Warning</option>
+                        <option value="SAR_FILED">File Formal Suspicious Activity Report (SAR)</option>
+                        <option value="ESCALATED_LEGAL">Refer to Senior Legal / Compliance</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-slate-400 block mb-1">Reviewing Compliance Officer</label>
+                      <label className="text-slate-400 block mb-1">Analyst Name</label>
                       <input
                         type="text"
                         value={analystName}
@@ -373,12 +386,12 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
 
                   {/* Notes Textarea */}
                   <div>
-                    <label className="text-slate-400 block mb-1 text-xs">Mandatory Audit Justification & Notes</label>
+                    <label className="text-slate-400 block mb-1 text-xs">Analyst Notes & Verification Reason</label>
                     <textarea
                       rows={2}
                       value={analystNotes}
                       onChange={(e) => setAnalystNotes(e.target.value)}
-                      placeholder="Detail findings from customer outreach, phone verification, IP geolocation checks, or baseline justification..."
+                      placeholder="e.g. Called customer on registered phone; they confirmed they made this purchase during travel..."
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-teal-500 placeholder-slate-600"
                     />
                   </div>
@@ -389,23 +402,23 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
                     disabled={submitting}
                     className="w-full py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-teal-500/20 transition cursor-pointer disabled:opacity-50"
                   >
-                    {submitting ? 'Recording Human Approval...' : 'Sign Off & Record Human Determination'}
+                    {submitting ? 'Saving Decision...' : 'Save Decision'}
                   </button>
                 </form>
               </div>
 
-              {/* Historical Approvals Audit Trail */}
+              {/* Historical Decisions Log */}
               {caseDetail.approvals_history && caseDetail.approvals_history.length > 0 && (
                 <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80 space-y-3">
                   <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Governance Audit Trail
+                    Past Decision History
                   </h3>
                   <div className="space-y-2">
                     {caseDetail.approvals_history.map((appr, idx) => (
                       <div key={idx} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-xs space-y-1">
                         <div className="flex items-center justify-between">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${getStatusBadge(appr.decision)}`}>
-                            {appr.decision}
+                            {getStatusLabel(appr.decision)}
                           </span>
                           <span className="text-slate-500 text-[10px] font-mono">
                             {new Date(appr.reviewed_at).toLocaleString()}
@@ -423,7 +436,7 @@ export default function CasesPage({ onSelectTransaction, onNavigateToReport }) {
             </div>
           ) : (
             <div className="p-12 rounded-2xl bg-[#0d1322] border border-slate-800 text-center text-slate-500 text-xs">
-              Select a case from the queue to review AI recommendations and render a decision.
+              Select a case from the queue on the left to review and render a decision.
             </div>
           )}
         </div>

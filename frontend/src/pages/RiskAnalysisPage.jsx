@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   ShieldAlert,
   BarChart2,
-  PieChart as PieIcon,
-  HelpCircle,
-  TrendingDown,
   Info,
-  CheckCircle2,
-  Sliders,
-  MapPin
+  MapPin,
+  Clock,
+  Sparkles
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -20,8 +17,7 @@ import {
   Tooltip,
   BarChart,
   Bar,
-  Cell,
-  Legend
+  Cell
 } from 'recharts';
 import { fetchRiskAnalytics } from '../api/client';
 
@@ -46,7 +42,7 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
       <div className="p-8 flex items-center justify-center min-h-[60vh] text-slate-400">
         <div className="flex items-center space-x-3">
           <div className="animate-spin h-6 w-6 border-2 border-teal-500 border-t-transparent rounded-full"></div>
-          <span className="text-sm font-medium">Computing anomaly distributions & feature splits...</span>
+          <span className="text-sm font-medium">Loading Risk Analysis...</span>
         </div>
       </div>
     );
@@ -71,58 +67,57 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
-      {/* Page Title */}
+      {/* Title */}
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight flex items-center space-x-2.5">
-          <span>Fraud Detection & Anomaly Analysis</span>
+          <span>Risk Analysis & Patterns</span>
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Unsupervised Isolation Forest feature mapping, channel threat vectors & behavioral deviations.
+          Explore what makes transactions look suspicious: high amounts, unusual hours, and channel shifts.
         </p>
       </div>
 
-      {/* Methodology Banner */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/40 via-teal-950/30 to-slate-900 border border-teal-500/20 text-xs text-slate-300">
+      {/* Plain English Explanation Banner */}
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/40 via-teal-950/20 to-slate-900 border border-teal-500/20 text-xs text-slate-300">
         <div className="flex items-start space-x-3">
           <div className="p-2 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 shrink-0 mt-0.5">
             <Info className="h-5 w-5" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-semibold text-white text-sm">How Isolation Forest Detects Anomalies</h3>
+            <h3 className="font-semibold text-white text-sm">How Does the AI Detect Suspicious Transactions?</h3>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              Unlike supervised models that require labeled fraud cases, <strong>Isolation Forest</strong> partitions the feature space
-              randomly. Because anomalies are "few and different," they isolate in noticeably fewer recursive splits (shorter tree path lengths).
-              Notice the scatter cluster below: transactions executed between <strong>01:00 and 05:00</strong> with amounts over <strong>₹40,000</strong> isolate
-              rapidly as high-risk anomalies.
+              Instead of relying only on rigid rules, FraudTrace uses <strong>Machine Learning (Isolation Forest)</strong> to understand normal customer behavior.
+              When a transaction has an unusually high amount at <strong>2:30 AM</strong> via an online channel, it isolates rapidly as an anomaly.
+              In the chart below, notice how transactions in the top-left (late night + large amounts) are flagged with red and orange risk indicators.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main Scatter Chart (Amount vs Hour vs Risk Level) */}
+      {/* Main Scatter Chart (Amount vs Hour) */}
       <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
             <h2 className="text-sm font-semibold text-white flex items-center space-x-2">
               <ShieldAlert className="h-4 w-4 text-teal-400" />
-              <span>Multi-Dimensional Anomaly Cluster (Amount vs Execution Hour)</span>
+              <span>Transaction Pattern Map (Amount vs Time of Day)</span>
             </h2>
             <p className="text-[11px] text-slate-400 mt-0.5">
-              Each point represents a transaction. Shaded by calibrated risk tier.
+              Hover over any dot to see transaction details and risk reasons.
             </p>
           </div>
-          <div className="flex items-center space-x-3 text-xs">
+          <div className="flex items-center space-x-4 text-xs">
             <span className="flex items-center space-x-1.5 text-slate-400">
               <span className="h-2.5 w-2.5 rounded-full bg-red-500"></span>
-              <span>Critical</span>
+              <span>Critical Risk</span>
             </span>
             <span className="flex items-center space-x-1.5 text-slate-400">
               <span className="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
-              <span>High</span>
+              <span>High Risk</span>
             </span>
             <span className="flex items-center space-x-1.5 text-slate-400">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-              <span>Low</span>
+              <span>Normal</span>
             </span>
           </div>
         </div>
@@ -148,7 +143,7 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
                 fontSize={11}
                 tickFormatter={(val) => `₹${(val / 1000).toFixed(0)}k`}
               />
-              <ZAxis range={[30, 90]} />
+              <ZAxis range={[35, 80]} />
               <Tooltip
                 cursor={{ strokeDasharray: '3 3' }}
                 content={({ active, payload }) => {
@@ -161,14 +156,14 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
                           ₹{item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </div>
                         <div className="text-slate-400">
-                          Hour: <span className="text-slate-200">{item.hour}:00</span> | Channel: <span className="text-slate-200 uppercase">{item.channel}</span>
+                          Time: <span className="text-slate-200">{item.hour}:00</span> | Channel: <span className="text-slate-200 uppercase">{item.channel}</span>
                         </div>
                         <div className="pt-1">
                           <span
                             className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold"
                             style={{ backgroundColor: `${getRiskColor(item.risk_level)}20`, color: getRiskColor(item.risk_level) }}
                           >
-                            {item.risk_level} ({item.risk_score.toFixed(1)}/100)
+                            {item.risk_level} ({item.risk_score.toFixed(0)}/100)
                           </span>
                         </div>
                       </div>
@@ -179,7 +174,7 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
               />
               <Scatter name="Transactions" data={scatter}>
                 {scatter.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getRiskColor(entry.risk_level)} opacity={0.75} />
+                  <Cell key={`cell-${index}`} fill={getRiskColor(entry.risk_level)} opacity={0.8} />
                 ))}
               </Scatter>
             </ScatterChart>
@@ -187,13 +182,13 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
         </div>
       </div>
 
-      {/* Two Columns: Channel Anomaly Rates & City Risk Breakdown */}
+      {/* Two Columns: Channel Breakdown & City Risk Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Channel Breakdown */}
         <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80">
-          <h2 className="text-sm font-semibold text-white mb-1">Channel Anomaly Distribution</h2>
+          <h2 className="text-sm font-semibold text-white mb-1">Suspicious Activity by Payment Channel</h2>
           <p className="text-[11px] text-slate-400 mb-4">
-            Percentage of transactions flagged as anomalous per payment channel.
+            Percentage of transactions flagged as suspicious for each payment method.
           </p>
 
           <div className="h-56 w-full">
@@ -209,7 +204,7 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
                     fontSize: '11px',
                   }}
                 />
-                <Bar dataKey="anomaly_rate" name="Anomaly Rate %" radius={[6, 6, 0, 0]}>
+                <Bar dataKey="anomaly_rate" name="Flagged %" radius={[6, 6, 0, 0]}>
                   {channelStats.map((entry, index) => (
                     <Cell
                       key={`bar-${index}`}
@@ -222,11 +217,11 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
           </div>
         </div>
 
-        {/* Top Cities Risk Density */}
+        {/* City Breakdown */}
         <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80">
-          <h2 className="text-sm font-semibold text-white mb-1">Geographic Hotspots</h2>
+          <h2 className="text-sm font-semibold text-white mb-1">Flagged Transactions by City</h2>
           <p className="text-[11px] text-slate-400 mb-4">
-            High-risk transaction counts across major operational hubs.
+            Count of high-risk transactions across major locations.
           </p>
 
           <div className="space-y-3 pt-1">
@@ -241,7 +236,7 @@ export default function RiskAnalysisPage({ onSelectTransaction }) {
                       <span>{c.city}</span>
                     </span>
                     <span className="text-slate-400 font-mono text-[11px]">
-                      <span className="text-red-400 font-bold">{c.high_risk}</span> high-risk / {c.total} total
+                      <span className="text-red-400 font-bold">{c.high_risk}</span> flagged of {c.total}
                     </span>
                   </div>
                   <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">

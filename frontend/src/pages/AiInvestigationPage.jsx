@@ -13,10 +13,10 @@ import {
   ChevronRight,
   Terminal,
   Clock,
-  Layers,
   ArrowRight,
   User,
-  AlertTriangle
+  AlertTriangle,
+  Layers
 } from 'lucide-react';
 import { runInvestigation, fetchInvestigationDetail, chatCaseAgent, fetchInvestigations } from '../api/client';
 
@@ -38,8 +38,9 @@ export default function AiInvestigationPage({
 
   // Expanded tool logs
   const [expandedLogs, setExpandedLogs] = useState({});
+  const [showTechnicalSteps, setShowTechnicalSteps] = useState(true);
 
-  // Quick select recent high risk transactions
+  // Quick select recent cases
   const [recentCases, setRecentCases] = useState([]);
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function AiInvestigationPage({
         setMessages([
           {
             role: 'agent',
-            text: `Forensic investigation for **${res.transaction_id}** is loaded. Risk Score: **${res.risk_score}/100** (${res.priority}). You can ask me any question about customer baselines, velocity checks, or evidence.`,
+            text: `Forensic report for **${res.transaction_id}** is loaded. Risk Score: **${res.risk_score?.toFixed(0)}/100** (${res.priority}). You can ask me any question about the customer, past spending habits, or why this was flagged.`,
           },
         ]);
         setInvestigating(false);
@@ -91,7 +92,7 @@ export default function AiInvestigationPage({
         setMessages([
           {
             role: 'agent',
-            text: `Autonomous investigation for transaction **${res.transaction_id}** completed. Assigned Case: **${res.case_id}**. Risk Score is **${res.risk_score}/100** (${res.risk_level}). What would you like to verify?`,
+            text: `Investigation for transaction **${res.transaction_id}** complete. Assigned Case ID: **${res.case_id}**. Assessed risk is **${res.risk_score?.toFixed(0)}/100** (${res.risk_level}). What would you like to verify?`,
           },
         ]);
         setInvestigating(false);
@@ -128,7 +129,7 @@ export default function AiInvestigationPage({
           ...prev,
           {
             role: 'agent',
-            text: `Error communicating with agent: ${err.message}`,
+            text: `Error from agent: ${err.message}`,
           },
         ]);
         setChatLoading(false);
@@ -146,7 +147,7 @@ export default function AiInvestigationPage({
 
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
-      {/* Top Header & Investigation Launcher */}
+      {/* Top Header & Launcher */}
       <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -154,14 +155,14 @@ export default function AiInvestigationPage({
               <div className="p-1.5 rounded-lg bg-teal-500/10 border border-teal-500/30 text-teal-400">
                 <Bot className="h-5 w-5" />
               </div>
-              <span>AI Investigation Agent & MCP Tool Orchestrator</span>
+              <span>AI Investigation Assistant</span>
             </h1>
             <p className="text-xs text-slate-400 mt-1">
-              Autonomous multi-step forensic inspection using standard Model Context Protocol (MCP) tool integration.
+              The AI agent automatically examines suspicious transactions, checks customer history, and prepares evidence reports.
             </p>
           </div>
 
-          {/* Transaction Input & Run Button */}
+          {/* Transaction Input & Button */}
           <div className="flex items-center space-x-2">
             <input
               type="text"
@@ -173,17 +174,17 @@ export default function AiInvestigationPage({
             <button
               onClick={() => startInvestigation(transactionId)}
               disabled={investigating || !transactionId}
-              className="py-2 px-4 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-md shadow-teal-500/20 transition disabled:opacity-50 cursor-pointer"
+              className="py-2 px-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-md shadow-teal-500/20 transition disabled:opacity-50 cursor-pointer"
             >
               <Play className={`h-3.5 w-3.5 ${investigating ? 'animate-spin' : ''}`} />
-              <span>{investigating ? 'Investigating...' : 'Run Investigation'}</span>
+              <span>{investigating ? 'Investigating...' : 'Investigate'}</span>
             </button>
           </div>
         </div>
 
-        {/* Quick Pick Case Pills */}
+        {/* Quick Pick Pills */}
         <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center space-x-2 text-xs overflow-x-auto">
-          <span className="text-slate-500 text-[11px] shrink-0">Recent Flagged Cases:</span>
+          <span className="text-slate-500 text-[11px] shrink-0">Flagged Cases to Inspect:</span>
           {recentCases.slice(0, 5).map((c) => (
             <button
               key={c.id}
@@ -207,35 +208,34 @@ export default function AiInvestigationPage({
         </div>
       )}
 
-      {/* Main Investigation Split Layout */}
+      {/* Main Split Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Live Agent Execution Trace (Telemetry) */}
+        {/* Left Column: Investigation Steps (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           <div className="p-5 rounded-2xl bg-[#0d1322] border border-slate-800/80">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-white flex items-center space-x-2">
                 <Terminal className="h-4 w-4 text-teal-400" />
-                <span>Agent Execution Telemetry & MCP Trace</span>
+                <span>AI Steps & Tools Used</span>
               </h2>
-              <span className="text-[10px] font-mono text-teal-400 px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/20">
-                {executionTrace.length} Steps Logged
+              <span className="text-[10px] font-mono text-teal-300 px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/20">
+                {executionTrace.length} Steps
               </span>
             </div>
 
             {investigating ? (
               <div className="py-12 text-center text-slate-400 text-xs space-y-3">
                 <div className="animate-spin h-6 w-6 border-2 border-teal-500 border-t-transparent rounded-full mx-auto"></div>
-                <div>AI Agent is querying MCP tools and evaluating forensic evidence...</div>
+                <div>Examining customer history and running anomaly models...</div>
               </div>
             ) : executionTrace.length === 0 ? (
               <div className="py-12 text-center text-slate-500 text-xs">
-                Select a transaction and run investigation to observe live agent thoughts and tool calls.
+                Select a transaction above and click "Investigate" to see the AI's step-by-step thinking.
               </div>
             ) : (
-              <div className="space-y-3 max-h-[640px] overflow-y-auto pr-1">
+              <div className="space-y-2.5 max-h-[640px] overflow-y-auto pr-1">
                 {executionTrace.map((log, idx) => {
                   const isTool = log.action_type === 'TOOL_CALL';
-                  const isThought = log.action_type === 'THOUGHT';
                   const isConclusion = log.action_type === 'CONCLUSION';
                   const isExpanded = !!expandedLogs[idx];
 
@@ -255,22 +255,9 @@ export default function AiInvestigationPage({
                           <span className="h-5 w-5 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-mono text-[10px] font-bold">
                             {log.step_index || idx + 1}
                           </span>
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
-                              isTool
-                                ? 'bg-teal-500/20 text-teal-300'
-                                : isConclusion
-                                ? 'bg-emerald-500/20 text-emerald-300'
-                                : 'bg-slate-800 text-slate-400'
-                            }`}
-                          >
-                            {log.action_type}
+                          <span className="text-slate-200 font-semibold text-xs">
+                            {isTool ? `Checked: ${log.tool_name}` : isConclusion ? 'Summary Report' : 'Thinking'}
                           </span>
-                          {log.tool_name && (
-                            <span className="font-mono text-teal-400 text-[11px] font-medium">
-                              {log.tool_name}()
-                            </span>
-                          )}
                         </div>
 
                         {log.tool_output && (
@@ -278,7 +265,7 @@ export default function AiInvestigationPage({
                             onClick={() => toggleLog(idx)}
                             className="text-slate-400 hover:text-slate-200 text-[10px] flex items-center space-x-0.5 cursor-pointer"
                           >
-                            <span>Payload</span>
+                            <span>Details</span>
                             {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                           </button>
                         )}
@@ -291,17 +278,9 @@ export default function AiInvestigationPage({
                       {/* Expandable Tool Input / Output */}
                       {isExpanded && (
                         <div className="mt-2 pt-2 border-t border-slate-800/80 space-y-2 text-[10px] font-mono">
-                          {log.tool_input && (
-                            <div>
-                              <span className="text-slate-500 block">Input:</span>
-                              <pre className="p-2 rounded bg-slate-950 text-slate-300 overflow-x-auto">
-                                {JSON.stringify(log.tool_input, null, 2)}
-                              </pre>
-                            </div>
-                          )}
                           {log.tool_output && (
                             <div>
-                              <span className="text-slate-500 block">Result:</span>
+                              <span className="text-slate-500 block">Data Found:</span>
                               <pre className="p-2 rounded bg-slate-950 text-teal-300/90 overflow-x-auto">
                                 {JSON.stringify(log.tool_output, null, 2)}
                               </pre>
@@ -317,43 +296,43 @@ export default function AiInvestigationPage({
           </div>
         </div>
 
-        {/* Right Column: Structured Evidence-Based Report & Chat */}
+        {/* Right Column: Evidence-Based Report & Chat (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Evidence-Based Report Card */}
+          {/* Report Card */}
           <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80 shadow-sm space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-800">
               <div>
-                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                <span className="text-[10px] font-mono text-slate-500 uppercase block">
                   Case ID: {currentResult?.case_id || currentResult?.id || 'PENDING'}
                 </span>
                 <h2 className="text-base font-bold text-white mt-0.5">
-                  Evidence-Based Forensic Report
+                  AI Investigation Report
                 </h2>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs text-slate-400">Status:</span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                  {currentResult?.status || 'PENDING_HUMAN_REVIEW'}
+                <span className="text-xs text-slate-400">Risk Assessment:</span>
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
+                  {currentResult?.risk_level || 'High'} Risk ({currentResult?.risk_score?.toFixed(0) || '85'}/100)
                 </span>
               </div>
             </div>
 
-            {/* AI Summary Narrative */}
+            {/* Plain English Summary */}
             <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
               <span className="text-xs font-semibold text-teal-400 block mb-1 flex items-center space-x-1.5">
                 <Sparkles className="h-3.5 w-3.5" />
-                <span>Executive Summary</span>
+                <span>Summary (What happened?)</span>
               </span>
               <p className="text-xs text-slate-200 leading-relaxed">
-                {currentResult?.ai_summary || 'Run an investigation to synthesize automated forensic findings.'}
+                {currentResult?.ai_summary || 'Run an investigation above to see findings.'}
               </p>
             </div>
 
-            {/* Observations & Evidence Grid */}
+            {/* Observations & Evidence */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               {/* Observations */}
               <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 space-y-2">
-                <span className="font-semibold text-slate-200 block text-xs">Forensic Observations</span>
+                <span className="font-semibold text-slate-200 block text-xs">Transaction Observations</span>
                 <ul className="space-y-1.5 text-[11px] text-slate-300">
                   {observations.map((obs, i) => (
                     <li key={i} className="flex items-start space-x-2">
@@ -364,9 +343,9 @@ export default function AiInvestigationPage({
                 </ul>
               </div>
 
-              {/* Evidence Dossier */}
+              {/* Evidence */}
               <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 space-y-2">
-                <span className="font-semibold text-slate-200 block text-xs">Evidence Dossier</span>
+                <span className="font-semibold text-slate-200 block text-xs">Why Was It Flagged?</span>
                 <ul className="space-y-1.5 text-[11px] text-slate-300">
                   {evidence.map((ev, i) => (
                     <li key={i} className="flex items-start space-x-2">
@@ -378,16 +357,16 @@ export default function AiInvestigationPage({
               </div>
             </div>
 
-            {/* Recommendation & Action Steps */}
+            {/* Recommendation & Next Steps */}
             <div className="p-4 rounded-xl bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 space-y-2">
-              <span className="font-semibold text-slate-200 block text-xs">AI Agent Recommendation</span>
+              <span className="font-semibold text-slate-200 block text-xs">Recommended Action for Analyst</span>
               <p className="text-xs text-slate-300 italic">
                 "{currentResult?.recommendation || 'Awaiting investigation...'}"
               </p>
 
               {nextSteps.length > 0 && (
                 <div className="pt-2 border-t border-slate-800/80">
-                  <span className="text-[11px] font-medium text-slate-400 block mb-1">Recommended Next Steps:</span>
+                  <span className="text-[11px] font-medium text-slate-400 block mb-1">What to verify next:</span>
                   <div className="space-y-1">
                     {nextSteps.map((step, idx) => (
                       <div key={idx} className="flex items-center space-x-2 text-[11px] text-slate-300">
@@ -405,32 +384,32 @@ export default function AiInvestigationPage({
             {/* Human in the loop redirect */}
             <div className="pt-2 flex items-center justify-between text-xs">
               <span className="text-slate-400 text-[11px]">
-                Requires human analyst sign-off before account or card restriction.
+                A human analyst must review and approve before any account restriction.
               </span>
               <button
                 onClick={() => onNavigateToTab('cases')}
-                className="px-3 py-1.5 rounded-lg bg-teal-500 text-slate-950 font-bold text-xs hover:bg-teal-400 transition cursor-pointer flex items-center space-x-1"
+                className="px-3.5 py-1.5 rounded-lg bg-teal-500 text-slate-950 font-bold text-xs hover:bg-teal-400 transition cursor-pointer flex items-center space-x-1"
               >
-                <span>Go to Human Review Board</span>
+                <span>Go to Review Board</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
 
-          {/* Interactive Analyst Chat Console */}
+          {/* Interactive Chat Console */}
           <div className="p-6 rounded-2xl bg-[#0d1322] border border-slate-800/80 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold text-white flex items-center space-x-2">
                 <MessageSquare className="h-4 w-4 text-teal-400" />
-                <span>Interactive Case Q&A with Agent</span>
+                <span>Ask the AI Investigator Questions</span>
               </h2>
               <span className="text-[11px] text-slate-500">
-                Ask about velocity, customer history, or why flagged
+                Ask about customer history, why it was flagged, or recommended actions
               </span>
             </div>
 
             {/* Chat Messages Log */}
-            <div className="h-48 overflow-y-auto space-y-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-xs">
+            <div className="h-44 overflow-y-auto space-y-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-xs">
               {messages.map((m, idx) => (
                 <div
                   key={idx}
@@ -443,13 +422,8 @@ export default function AiInvestigationPage({
                         : 'bg-slate-800/80 text-slate-200 border border-slate-700/80'
                     }`}
                   >
-                    <div className="text-[10px] font-semibold text-slate-400 mb-1 flex items-center justify-between">
-                      <span>{m.role === 'user' ? 'Analyst' : 'AI Agent (FraudTrace)'}</span>
-                      {m.tool_used && (
-                        <span className="font-mono text-teal-400 text-[9px] bg-slate-900 px-1 py-0.5 rounded">
-                          tool: {m.tool_used}
-                        </span>
-                      )}
+                    <div className="text-[10px] font-semibold text-slate-400 mb-1">
+                      {m.role === 'user' ? 'You (Analyst)' : 'AI Investigator'}
                     </div>
                     <div className="text-[11px] whitespace-pre-line leading-relaxed">
                       {m.text}
@@ -461,7 +435,7 @@ export default function AiInvestigationPage({
                 <div className="flex justify-start">
                   <div className="p-2.5 rounded-xl bg-slate-800/80 text-slate-400 text-xs flex items-center space-x-2">
                     <div className="animate-spin h-3.5 w-3.5 border border-teal-500 border-t-transparent rounded-full"></div>
-                    <span>Consulting forensic database...</span>
+                    <span>Checking transaction data...</span>
                   </div>
                 </div>
               )}
@@ -473,7 +447,7 @@ export default function AiInvestigationPage({
                 type="text"
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ask e.g.: 'Why was this flagged?', 'Check customer history', 'What next?'..."
+                placeholder="Ask e.g.: 'Why was this flagged?', 'What is normal for this customer?', 'What should I do?'"
                 className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500"
               />
               <button

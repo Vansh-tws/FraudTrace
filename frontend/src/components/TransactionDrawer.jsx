@@ -78,7 +78,7 @@ export default function TransactionDrawer({
             </div>
             <div>
               <div className="text-xs font-mono text-slate-400">{transactionId}</div>
-              <h2 className="text-sm font-semibold text-white">Transaction Forensic Dossier</h2>
+              <h2 className="text-sm font-semibold text-white">Transaction Details</h2>
             </div>
           </div>
           <button
@@ -142,7 +142,7 @@ export default function TransactionDrawer({
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-slate-200 flex items-center space-x-1.5">
                   <User className="h-4 w-4 text-teal-400" />
-                  <span>Customer Behavioral Baseline</span>
+                  <span>Customer Usual Spending Profile</span>
                 </span>
                 <span className="text-[11px] font-mono text-teal-400">{cust?.user_id}</span>
               </div>

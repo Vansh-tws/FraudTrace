@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import TransactionDrawer from './components/TransactionDrawer';
+import DatasetSelectorModal from './components/DatasetSelectorModal';
 
 import OverviewPage from './pages/OverviewPage';
 import TransactionsPage from './pages/TransactionsPage';
@@ -11,15 +12,20 @@ import CasesPage from './pages/CasesPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 
-import { fetchOverview, fetchHealth, seedDatabase, fetchInvestigations } from './api/client';
+import { fetchOverview, fetchHealth, fetchInvestigations } from './api/client';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [overviewData, setOverviewData] = useState(null);
   const [systemHealth, setSystemHealth] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isSeeding, setIsSeeding] = useState(false);
   const [pendingCasesCount, setPendingCasesCount] = useState(0);
+
+  // Onboarding / Dataset Selection Modal State
+  // If the user hasn't chosen yet, modal is open on start
+  const [isDatasetModalOpen, setIsDatasetModalOpen] = useState(() => {
+    return !localStorage.getItem('fraudtrace_dataset_ready');
+  });
 
   // Drawer & Navigation targets
   const [selectedTxnId, setSelectedTxnId] = useState(null);
@@ -27,7 +33,7 @@ export default function App() {
   const [targetCaseId, setTargetCaseId] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const loadInitialData = () => {
+  const loadData = () => {
     setLoading(true);
     Promise.all([fetchOverview(), fetchHealth(), fetchInvestigations('PENDING')])
       .then(([ov, health, pendingCases]) => {
@@ -43,20 +49,21 @@ export default function App() {
   };
 
   useEffect(() => {
-    loadInitialData();
+    loadData();
   }, []);
 
-  const handleSeedData = () => {
-    setIsSeeding(true);
-    seedDatabase()
-      .then(() => {
-        setIsSeeding(false);
-        loadInitialData();
-      })
-      .catch((err) => {
-        console.error(err);
-        setIsSeeding(false);
-      });
+  const handleSelectSampleDataset = () => {
+    localStorage.setItem('fraudtrace_dataset_ready', 'true');
+    setIsDatasetModalOpen(false);
+    loadData();
+    setActiveTab('overview');
+  };
+
+  const handleUploadSuccess = () => {
+    localStorage.setItem('fraudtrace_dataset_ready', 'true');
+    setIsDatasetModalOpen(false);
+    loadData();
+    setActiveTab('overview');
   };
 
   const handleStartInvestigation = (txnId) => {
@@ -100,13 +107,11 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Navbar
           onQuickSearch={handleQuickSearch}
-          onSeedData={handleSeedData}
-          isSeeding={isSeeding}
+          onOpenDatasetModal={() => setIsDatasetModalOpen(true)}
           systemHealth={systemHealth}
-          onOpenSettings={() => setActiveTab('settings')}
         />
 
-        {/* Tab Content with Smooth Scroll */}
+        {/* Tab Content */}
         <main className="flex-1 overflow-y-auto bg-gradient-to-b from-[#070b14] via-[#090e1a] to-[#070b14]">
           {activeTab === 'overview' && (
             <OverviewPage
@@ -151,12 +156,12 @@ export default function App() {
           )}
 
           {activeTab === 'settings' && (
-            <SettingsPage onDataReload={loadInitialData} />
+            <SettingsPage onDataReload={loadData} />
           )}
         </main>
       </div>
 
-      {/* Slide-Over Transaction Forensic Drawer */}
+      {/* Slide-Over Transaction Details Drawer */}
       {selectedTxnId && (
         <TransactionDrawer
           transactionId={selectedTxnId}
@@ -165,6 +170,15 @@ export default function App() {
           onViewCase={handleViewCase}
         />
       )}
+
+      {/* Onboarding & Dataset Switcher Modal */}
+      <DatasetSelectorModal
+        isOpen={isDatasetModalOpen}
+        onClose={() => setIsDatasetModalOpen(false)}
+        onSelectSample={handleSelectSampleDataset}
+        onUploadSuccess={handleUploadSuccess}
+        canClose={!!overviewData}
+      />
     </div>
   );
 }

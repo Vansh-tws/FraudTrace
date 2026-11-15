@@ -13,7 +13,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc, or_
+from sqlalchemy import func, desc, or_, case
 import pandas as pd
 
 from backend.app.models.database import engine, get_db, Base
@@ -343,26 +343,34 @@ def get_transaction_detail(transaction_id: str, db: Session = Depends(get_db)):
 @app.get("/api/analytics/risk")
 def get_risk_analytics(db: Session = Depends(get_db)):
     """Data for scatter plots, feature impact, and channel risk distributions."""
-    # 1. Scatter sample (Amount vs Hour vs Risk Level)
-    sample_txns = (
-        db.query(Transaction, RiskAssessment)
-        .join(RiskAssessment)
+    # 1. Scatter sample (Amount vs Hour vs Risk Level) - select only needed columns for speed
+    scatter_rows = (
+        db.query(
+            Transaction.transaction_id,
+            Transaction.amount,
+            Transaction.hour,
+            RiskAssessment.risk_score,
+            RiskAssessment.risk_level,
+            Transaction.channel,
+            RiskAssessment.is_anomaly
+        )
+        .join(RiskAssessment, Transaction.transaction_id == RiskAssessment.transaction_id)
         .order_by(desc(RiskAssessment.risk_score))
-        .limit(300)
+        .limit(250)
         .all()
     )
 
     scatter_data = [
         {
-            "transaction_id": t.transaction_id,
-            "amount": t.amount,
-            "hour": t.hour,
-            "risk_score": ra.risk_score,
-            "risk_level": ra.risk_level,
-            "channel": t.channel,
-            "is_anomaly": ra.is_anomaly
+            "transaction_id": row[0],
+            "amount": row[1],
+            "hour": row[2],
+            "risk_score": row[3],
+            "risk_level": row[4],
+            "channel": row[5],
+            "is_anomaly": row[6]
         }
-        for t, ra in sample_txns
+        for row in scatter_rows
     ]
 
     # 2. Channel risk breakdown
@@ -370,10 +378,10 @@ def get_risk_analytics(db: Session = Depends(get_db)):
         db.query(
             Transaction.channel,
             func.count(Transaction.transaction_id).label("total"),
-            func.sum(func.case((RiskAssessment.is_anomaly == True, 1), else_=0)).label("anomalies"),
+            func.sum(case((RiskAssessment.is_anomaly == True, 1), else_=0)).label("anomalies"),
             func.avg(Transaction.amount).label("avg_amount")
         )
-        .join(RiskAssessment)
+        .join(RiskAssessment, Transaction.transaction_id == RiskAssessment.transaction_id)
         .group_by(Transaction.channel)
         .all()
     )
@@ -382,8 +390,8 @@ def get_risk_analytics(db: Session = Depends(get_db)):
         {
             "channel": ch,
             "total": tot,
-            "anomalies": anom,
-            "anomaly_rate": round((anom / tot) * 100, 2) if tot else 0,
+            "anomalies": anom or 0,
+            "anomaly_rate": round(((anom or 0) / tot) * 100, 2) if tot else 0,
             "avg_amount": round(float(avg_a or 0), 2)
         }
         for ch, tot, anom, avg_a in channel_query
@@ -394,9 +402,9 @@ def get_risk_analytics(db: Session = Depends(get_db)):
         db.query(
             Transaction.city,
             func.count(Transaction.transaction_id).label("total"),
-            func.sum(func.case((RiskAssessment.risk_level.in_(["Critical", "High"]), 1), else_=0)).label("high_risk_count")
+            func.sum(case((RiskAssessment.risk_level.in_(["Critical", "High"]), 1), else_=0)).label("high_risk_count")
         )
-        .join(RiskAssessment)
+        .join(RiskAssessment, Transaction.transaction_id == RiskAssessment.transaction_id)
         .group_by(Transaction.city)
         .order_by(desc("high_risk_count"))
         .limit(8)
@@ -404,15 +412,17 @@ def get_risk_analytics(db: Session = Depends(get_db)):
     )
 
     city_stats = [
-        {"city": c, "total": tot, "high_risk": hr}
+        {"city": c, "total": tot, "high_risk": hr or 0}
         for c, tot, hr in city_query
     ]
+
+    total_anomalies = db.query(func.count(RiskAssessment.id)).filter(RiskAssessment.is_anomaly == True).scalar() or 0
 
     return {
         "scatter_data": scatter_data,
         "channel_stats": channel_stats,
         "city_stats": city_stats,
-        "total_anomalies": db.query(RiskAssessment).filter(RiskAssessment.is_anomaly == True).count()
+        "total_anomalies": total_anomalies
     }
 
 
